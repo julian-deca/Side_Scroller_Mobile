@@ -10,6 +10,8 @@ window.addEventListener("load", () => {
   class InputHandlers {
     constructor() {
       this.keys = [];
+      this.touchY = "";
+      this.touchTreshold = 30;
       window.addEventListener("keydown", (e) => {
         if (
           (e.key === "ArrowDown" ||
@@ -30,6 +32,29 @@ window.addEventListener("load", () => {
         ) {
           this.keys.splice(this.keys.indexOf(e.key), 1);
         }
+      });
+      window.addEventListener("touchstart", (e) => {
+        this.touchY = e.changedTouches[0].pageY;
+      });
+      window.addEventListener("touchmove", (e) => {
+        const swipeDistance = e.changedTouches[0].pageY - this.touchY;
+        if (
+          swipeDistance < -this.touchTreshold &&
+          this.keys.indexOf("swipe up") === -1
+        )
+          this.keys.push("swipe up");
+        else if (
+          swipeDistance > -this.touchTreshold &&
+          this.keys.indexOf("swipe down") === -1
+        ) {
+          this.keys.push("swipe down");
+          if (gameOver) restartGame();
+        }
+      });
+      window.addEventListener("touchend", (e) => {
+        console.log(this.keys);
+        this.keys.splice(this.keys.indexOf("swipe up"), 1);
+        this.keys.splice(this.keys.indexOf("swipe down"), 1);
       });
     }
   }
@@ -83,7 +108,10 @@ window.addEventListener("load", () => {
       } else {
         this.speed = 0;
       }
-      if (input.keys.indexOf("ArrowUp") > -1 && this.onGround()) {
+      if (
+        input.keys.indexOf("ArrowUp") > -1 ||
+        (input.keys.indexOf("swipe up") > -1 && this.onGround())
+      ) {
         console.log("aaaa");
         this.vy -= 32;
       }
@@ -224,9 +252,17 @@ window.addEventListener("load", () => {
         200 + 3
       );
       context.fillStyle = "black";
-      context.fillText("Press Enter to Restart", WIDTH * 0.5, 200 + 60);
+      context.fillText(
+        "Press Enter or Swipe Down to Restart",
+        WIDTH * 0.5,
+        200 + 60
+      );
       context.fillStyle = "white";
-      context.fillText("Press Enter to Restart", WIDTH * 0.5 + 3, 200 + 63);
+      context.fillText(
+        "Press Enter or Swipe Down to Restart",
+        WIDTH * 0.5 + 3,
+        200 + 63
+      );
     }
   }
   function restartGame() {
