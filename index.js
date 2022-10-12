@@ -19,8 +19,7 @@ window.addEventListener("load", () => {
           this.keys.indexOf(e.key) === -1
         ) {
           this.keys.push(e.key);
-          console.log(this.keys);
-        }
+        } else if (e.key === "Enter" && gameOver) restartGame();
       });
       window.addEventListener("keyup", (e) => {
         if (
@@ -52,6 +51,12 @@ window.addEventListener("load", () => {
       this.fps = 20;
       this.frameTimer = 0;
       this.frameInterval = 1000 / this.fps;
+    }
+    restart() {
+      this.x = 100;
+      this.y = this.gameHeight - this.height;
+      this.maxFrame = 8;
+      this.frameY = 0;
     }
     update(input, deltaTime, enemies) {
       enemies.forEach((enemy) => {
@@ -142,6 +147,9 @@ window.addEventListener("load", () => {
       this.x -= this.speed;
       if (this.x < 0 - this.width) this.x = 0;
     }
+    restart() {
+      this.x = 0;
+    }
   }
 
   class Enemy {
@@ -199,6 +207,7 @@ window.addEventListener("load", () => {
     enemies = enemies.filter((enemy) => !enemy.markedForDeletion);
   }
   function displayStatusText(context) {
+    context.textAlign = "left";
     context.fillStyle = "black";
     context.font = "40px Helvetica ";
     context.fillText("Score: " + score, 20, 50);
@@ -214,7 +223,19 @@ window.addEventListener("load", () => {
         3 + WIDTH * 0.5,
         200 + 3
       );
+      context.fillStyle = "black";
+      context.fillText("Press Enter to Restart", WIDTH * 0.5, 200 + 60);
+      context.fillStyle = "white";
+      context.fillText("Press Enter to Restart", WIDTH * 0.5 + 3, 200 + 63);
     }
+  }
+  function restartGame() {
+    player.restart();
+    background.restart();
+    enemies = [];
+    score = 0;
+    gameOver = false;
+    animate(0);
   }
   const input = new InputHandlers();
   const player = new Player(WIDTH, HEIGHT);
