@@ -6,6 +6,7 @@ window.addEventListener("load", () => {
   let enemies = [];
   let score = 0;
   let gameOver = false;
+  const fullScreenButton = document.getElementById("fullScreenButton");
 
   class InputHandlers {
     constructor() {
@@ -86,11 +87,11 @@ window.addEventListener("load", () => {
     update(input, deltaTime, enemies) {
       enemies.forEach((enemy) => {
         const dx =
-          enemy.x + enemy.width * 0.5 - 13 - (this.x + this.width * 0.5);
+          enemy.x + enemy.width * 0.5 - 20 - (this.x + this.width * 0.5);
         const dy =
-          enemy.y + enemy.height * 0.5 + 13 - (this.y + this.height * 0.5);
+          enemy.y + enemy.height * 0.5 - (this.y + this.height * 0.5 + 20);
         const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < enemy.width * 0.5 - 13 + this.width * 0.5) {
+        if (distance < enemy.width / 3 + this.width / 3) {
           gameOver = true;
         }
       });
@@ -273,13 +274,28 @@ window.addEventListener("load", () => {
     gameOver = false;
     animate(0);
   }
+
+  function toggleFullScreen() {
+    console.log(document.fullscreenElement);
+    if (!document.fullscreenElement) {
+      canvas.requestFullscreen().catch((err) => {
+        alert(`Error,can't enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }
+  fullScreenButton.addEventListener("click", toggleFullScreen);
+
   const input = new InputHandlers();
   const player = new Player(WIDTH, HEIGHT);
   const background = new Background(WIDTH, HEIGHT);
+
   let lastTime = 0;
   let enemyTimer = 0;
   let enemyInterval = 2000;
   let randomInterval = Math.random() * 1000 + 500;
+
   function animate(timeStamp) {
     const deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
